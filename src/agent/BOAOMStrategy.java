@@ -1,0 +1,22 @@
+package agent;
+
+import java.util.List;
+
+import negotiator.bidding.BidDetails;
+import negotiator.boaframework.OMStrategy;
+
+public class BOAOMStrategy extends OMStrategy {
+
+	@Override
+	public boolean canUpdateOM() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public BidDetails getBid(List<BidDetails> arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
