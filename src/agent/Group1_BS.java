@@ -3,7 +3,7 @@ package agent;
 import negotiator.bidding.BidDetails;
 import negotiator.boaframework.OfferingStrategy;
 
-public class BOAOfferingStrategy extends OfferingStrategy {
+public class Group1_BS extends OfferingStrategy {
 
 	@Override
 	public BidDetails determineNextBid() {

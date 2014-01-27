@@ -5,7 +5,7 @@ import java.util.List;
 import negotiator.bidding.BidDetails;
 import negotiator.boaframework.OMStrategy;
 
-public class BOAOMStrategy extends OMStrategy {
+public class Group1_OMS extends OMStrategy {
 
 	@Override
 	public boolean canUpdateOM() {
