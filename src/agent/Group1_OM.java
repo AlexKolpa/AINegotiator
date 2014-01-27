@@ -3,7 +3,7 @@ import negotiator.Bid;
 import negotiator.boaframework.OpponentModel;
 
 
-public class BOAOpponentModel extends OpponentModel {
+public class Group1_OM extends OpponentModel {
 
 	@Override
 	public void updateModel(Bid arg0, double arg1) {
