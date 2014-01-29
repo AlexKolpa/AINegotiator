@@ -36,26 +36,39 @@ public class Group1_AS extends AcceptanceStrategy {
 	public Actions determineAcceptability() {
 		// TODO Auto-generated method stub
 		
+		// FIXME Remove debug output
+		System.out.println("AS: determineAcceptability()");
+		
 		/*
 		 * Get information about the current state of the negotiation
 		 */
 		
 		// Get the current time
 		double timeNow = negotiationSession.getTime();
+		// Get the discounted utility of the opponent's last bid
+		double opponentBidUtility = negotiationSession.getDiscountedUtility(negotiationSession.getOpponentBidHistory().getLastBid(), timeNow);
+		
+		// FIXME Remove debug output
+		System.out.println("AS: timeNow="+timeNow);
+		System.out.println("AS: opponentBidUtility="+opponentBidUtility);
 		
 		/*
 		 * Decide what to do now
 		 */
 		
-		if(isACcombiAcceptable(timeNow))
+		// FIXME Remove debug output
+		if(isACcombiAcceptable(timeNow,opponentBidUtility)) {
+			System.out.println("AS: Accept");
 			return Actions.Accept;
-		else
+		} else {
+			System.out.println("AS: Reject");
 			return Actions.Reject;
+		}
 	}
 	
-	boolean isACcombiAcceptable(double time) {
+	boolean isACcombiAcceptable(double time, double opponentBidUtility) {
 		// TODO Check ACcombi as described in the paper
-		return isACtimeAcceptable(time);
+		return isACtimeAcceptable(time) || isACconstAcceptable(opponentBidUtility);
 	}
 	
 	boolean isACnextAcceptable() {
@@ -68,9 +81,9 @@ public class Group1_AS extends AcceptanceStrategy {
 		return time > deadline;
 	}
 	
-	boolean isACconstAcceptable(double threshold) {
-		// TODO Check ACconst as described in the paper
-		return false;
+	boolean isACconstAcceptable(double opponentBidUtility) {
+		// isACconstAcceptable returns true when the discounted utility of the opponent's last bid is larger than the threshold.
+		return opponentBidUtility > threshold;
 	}
 
 }
