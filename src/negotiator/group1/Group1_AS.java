@@ -1,4 +1,4 @@
-package agent;
+package negotiator.group1;
 
 import negotiator.boaframework.AcceptanceStrategy;
 import negotiator.boaframework.Actions;
