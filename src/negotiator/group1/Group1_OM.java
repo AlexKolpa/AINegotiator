@@ -1,4 +1,4 @@
-package negotiator.group1;
+package agent;
 import negotiator.Bid;
 import negotiator.boaframework.OpponentModel;
 

@@ -1,4 +1,4 @@
-package negotiator.group1;
+package agent;
 
 import java.util.List;
 
