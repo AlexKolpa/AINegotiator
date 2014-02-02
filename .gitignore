@@ -5,3 +5,8 @@
 *.ear
 
 previousTournament
+
+# IntelliJ Files, sorry this should be in my personal .gitignore_global but lazy #
+
+.idea/
+*.iml
