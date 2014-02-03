@@ -2,6 +2,8 @@ package negotiator.group1;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.jfree.util.Log;
+
 import negotiator.Bid;
 import negotiator.boaframework.NegotiationSession;
 import negotiator.boaframework.OpponentModel;
@@ -17,18 +19,16 @@ public class Group1_OM extends OpponentModel {
 
 	//Tracks, for each issues, the amount of times each value has been offered
 	HashMap<Issue, HashMap<ValueDiscrete, Integer>> issueValueCount;
-	
-	//ease of access field so we dont have to request the UtilitySpace constantly
-	private int numberOfIssues;
-	
+		
 	//No parameters necessary. Simply set up the model.	
 	@Override
-	public void init(NegotiationSession negotiationSession) {
+	public void init(NegotiationSession negotiationSession, HashMap<String, Double> parameters) throws Exception {
 		this.negotiationSession = negotiationSession;
 		
 		setupModel();
 	}
-	
+
+
 	/**
 	 * Construct the new utility space.
 	 * Stores the numberOfIssues for ease of access.
@@ -37,7 +37,6 @@ public class Group1_OM extends OpponentModel {
 	private void setupModel(){
 		issueValueCount = new HashMap<Issue, HashMap<ValueDiscrete, Integer>>();		
 		opponentUtilitySpace = new UtilitySpace(negotiationSession.getUtilitySpace());
-		numberOfIssues = opponentUtilitySpace.getDomain().getIssues().size();
 				
 		// initialize all the weights
 		for(Entry<Objective, Evaluator> e: opponentUtilitySpace.getEvaluators()){
@@ -93,24 +92,37 @@ public class Group1_OM extends OpponentModel {
 	@Override	
 	public double getBidEvaluation(Bid bid) {
 		double result = 0;
+		
+		Issue issue = null;
+		ValueDiscrete value = null;
+		HashMap<ValueDiscrete, Integer> valueMap = null;
+		Integer count = null;
+		boolean passedPoint = false;
 		try {
 			int totalBids = negotiationSession.getOpponentBidHistory().size();
 			
 			int countScore = 0;
 			
 			for(Issue i : opponentUtilitySpace.getDomain().getIssues()){
-				
+				passedPoint = false;
+				issue = i;
 				//retrieve value from Bid through issueNumber
-				ValueDiscrete value = (ValueDiscrete)bid.getValue(i.getNumber());
+				value = (ValueDiscrete)bid.getValue(issue.getNumber());
 				//use issue to get the Value-Integer mapping
-				HashMap<ValueDiscrete, Integer> valueMap = issueValueCount.get(i);
-				Integer count = valueMap.get(value);
+				passedPoint = true;
+				valueMap = issueValueCount.get(issue);
+				count = valueMap.get(value);
 				
 				countScore += count;
 			}
 			
 			result = countScore / (double) totalBids; 
-		} catch (Exception e) {
+		} catch (Exception e) {		
+			System.out.println("past point: " + passedPoint);
+			System.out.println(issue == null? "Issue null" : issue.toString());
+			System.out.println(value == null? "value null" : value.toString());
+			System.out.println(valueMap == null? "valueMap null" : valueMap.toString());
+			System.out.println(count == null? "count null" : count.toString());
 			e.printStackTrace();
 		}
 		
