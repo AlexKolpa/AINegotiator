@@ -49,8 +49,6 @@ public class Group1_BS extends OfferingStrategy {
 		}
 
 		if (checkParameter(parameters.get("concessionRate"))) {
-			this.concessionRate = parameters.get("concessionRate");
-		} else {
 			this.concessionRate = 0.3;
 		}
 	}
