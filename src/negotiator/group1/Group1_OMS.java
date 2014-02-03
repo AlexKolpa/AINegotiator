@@ -29,7 +29,7 @@ public class Group1_OMS extends OMStrategy {
 	 */
 	@Override
 	public boolean canUpdateOM() {		
-		return true;
+		return negotiationSession.getOpponentBidHistory().size() < 100;
 	}
 
 	/**
