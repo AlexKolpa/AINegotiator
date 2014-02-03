@@ -1,0 +1,5 @@
+rm negotiator/group1/*
+cp bin/negotiator/group1/* negotiator/group1/
+cp src/negotiator/group1/* negotiator/group1/
+
+java -jar negosimulator.jar
