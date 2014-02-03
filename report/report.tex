@@ -1,19 +1,37 @@
 % This is the main file for the report. Please place chapters and other parts of text in tex/, images in img/. Don't forget to add new files below using input{}!
 
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{report}
 
 \usepackage{graphicx}
 \setkeys{Gin}{width=.8\textwidth} % Automatically scale images to 0.8*textwidth.
 \graphicspath{{./img/}} % Images are placed in img/
 
-\input{./tex/title.tex}
+\renewcommand{\bibname}{References} % Use References as a title instead of Bibliography
+
+\input{./tex/title}
 
 \begin{document}
 \maketitle{}
+\tableofcontents
 
 % Place \input{chapter} here.
+\input{./tex/introduction}
+\input{./tex/domainanalysis}
+\input{./tex/agentoverview}
+\input{./tex/agentBS}
+\input{./tex/agentAS}
+\input{./tex/agentOM}
+\input{./tex/testing}
+\input{./tex/futureperspectives}
+\input{./tex/conclusion}
+
+\clearpage
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{ieeetr}
+\bibliography{./tex/references}
 
 \appendix
 % Place \input{appendices}, if any, here.
+\input{./tex/testresults}
 
 \end{document}
