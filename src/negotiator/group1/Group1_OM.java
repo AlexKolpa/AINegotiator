@@ -15,45 +15,37 @@ import negotiator.utility.UtilitySpace;
 
 public class Group1_OM extends OpponentModel {
 
+	//Tracks, for each issues, the amount of times each value has been offered
 	HashMap<Issue, HashMap<ValueDiscrete, Integer>> issueValueCount;
 	
+	//ease of access field so we dont have to request the UtilitySpace constantly
 	private int numberOfIssues;
 	
+	//No parameters necessary. Simply set up the model.	
 	@Override
-	public void init(NegotiationSession negotiationSession, HashMap<String, Double> parameters) throws Exception {
-		this.negotiationSession = negotiationSession;		
-		
-		issueValueCount = new HashMap<Issue, HashMap<ValueDiscrete, Integer>>();
+	public void init(NegotiationSession negotiationSession) {
+		this.negotiationSession = negotiationSession;
 		
 		setupModel();
 	}
 	
 	/**
-	 * Default values normalized to 1.
+	 * Normalize
 	 */
 	private void setupModel(){
+		issueValueCount = new HashMap<Issue, HashMap<ValueDiscrete, Integer>>();		
 		opponentUtilitySpace = new UtilitySpace(negotiationSession.getUtilitySpace());
 		numberOfIssues = opponentUtilitySpace.getDomain().getIssues().size();
-		double sharedWeight = 1D / (double)numberOfIssues;    
-		
+				
 		// initialize all the weights
 		for(Entry<Objective, Evaluator> e: opponentUtilitySpace.getEvaluators()){
-			// set issue weights for each entry
-			opponentUtilitySpace.unlock(e.getKey());
-			
-			e.getValue().setWeight(sharedWeight);
-			
+			//setup a hashmap for each issue
 			HashMap<ValueDiscrete, Integer> valueMap = new HashMap<ValueDiscrete, Integer>();
-			try {				
-				for(ValueDiscrete value : ((IssueDiscrete)e.getKey()).getValues())
-				{
-					((EvaluatorDiscrete)e.getValue()).setEvaluation(value,1);
-					//initialize all counts at 0
-					valueMap.put(value, new Integer(0));
-				}
-				
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			
+			for(ValueDiscrete value : ((IssueDiscrete)e.getKey()).getValues())
+			{
+				//initialize all counts at 0
+				valueMap.put(value, new Integer(0));
 			}
 			
 			//store value counts for each issue in the map
@@ -61,12 +53,19 @@ public class Group1_OM extends OpponentModel {
 		}
 	}
 	
+	/**
+	 * Only update the counting table
+	 */
 	@Override
 	public void updateModel(Bid opponentBid, double time) {
 		insertBid(opponentBid);
 	}	
-		
-	//Inserts the bid into the counter
+	
+	
+	/**
+	 * Inserts the bid into the counting table.
+	 * @param opponentBid bid made by the opponent this round
+	 */
 	private void insertBid(Bid opponentBid) {
 		try{
 			for(Issue i : opponentUtilitySpace.getDomain().getIssues()){
@@ -83,8 +82,17 @@ public class Group1_OM extends OpponentModel {
 		}
 	}
 	
+	/**
+	 * the utility is determined by the sum of the amount of times 
+	 * each value has been offered divided by the maximum possible amount.
+	 * Since we don't know much in the beginning, assume the utility to be
+	 * 1 - (our own utility) 
+	 */
 	@Override	
-	public double getBidEvaluation(Bid bid) {
+	public double getBidEvaluation(Bid bid) {				
+		if(negotiationSession.getOpponentBidHistory().size() < 3)
+			return 1 -negotiationSession.getDiscountedUtility(bid, negotiationSession.getTime());
+		
 		double result = 0;
 		try {
 			int totalBids = negotiationSession.getOpponentBidHistory().size();
@@ -108,7 +116,7 @@ public class Group1_OM extends OpponentModel {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public String getName() {	
 		return "Counting Opponent Model";
