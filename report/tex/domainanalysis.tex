@@ -38,4 +38,32 @@ The optimal frontier for this problem is shown in Figure \ref{fig:pareto}.
 
 \section{Performance of simple agents}
 
-1b) Analyze the performance of the agent \texttt{SimpleAgent} in the party domain playing against itself. Is a Pareto optimal outcome reached? Explain your answer. Also explain why it obtains the resulting outcome that it does. Do the same for \texttt{Boulware} playing vs. \texttt{Conceder}.
+Now, the behavior of simple agents in the party domain will be examined.
+First, the agent \texttt{SimpleAgent} plays both sides of the negotiation.
+The resulting negotiation trace is shown in Figure \ref{fig:simpleagent}.
+\begin{figure}
+\centering
+\includegraphics{simpleagent.png}
+\caption{Negotiation trace of the agent \texttt{SimpleAgent} playing against itself in the party domain.}
+\label{fig:simpleagent}
+\end{figure}
+Although the agent is able to reach an agreement within the deadline, the outcome is far from optimal.
+This can be seen in the Figure \ref{fig:simpleagent}, as the final bid does not lie on the Pareto-optimal frontier.
+This happens because the \texttt{SimpleAgent} places bids randomly.
+Given the large amount of possible combinations, the chance that this produces Pareto-optimal solutions is very small.
+
+Next, the \texttt{Boulware} and \texttt{Conceder} agents are used to negotiate in the party domain.
+The negotiation trace is shown in Figure \ref{fig:boulwareconceder}.
+\begin{figure}
+\centering
+\includegraphics{boulwareconceder.png}
+\caption{Trace of the negotiation between the \texttt{Boulware} and \texttt{Conceder} agents in the party domain.}
+\label{fig:boulwareconceder}
+\end{figure}
+In contrast to the negotiation with \texttt{SimpleAgent}, the negotiation between the \texttt{Boulware} and \texttt{Conceder} agents does lead to a Pareto-optimal outcome.
+The outcome is consistently in favor of the \texttt{Boulware} agent.
+This can be explained as follows.
+The \texttt{Conceder} agent works by offering bids that are decreasing in its own utility.
+The \texttt{Boulware} agent, on the other hand, will make silent moves until the deadline is close.
+Only then will it start conceding.
+However, long before the deadline, the \texttt{Conceder} will have made an offer that has a utility of 1 for the \texttt{Boulware} agent, which will always be accepted.
