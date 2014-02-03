@@ -22,10 +22,11 @@ public class Group1_AS extends AcceptanceStrategy {
 	double utilityFactor = 1.0;
 	double utilityGap = 0.0;
 	
+	/**
+	 * Store information about the current negotiation session, and stores the parameters for the acceptance strategy.
+	 */
 	@Override
 	public void init(NegotiationSession negotiationSession,	OfferingStrategy offeringStrategy, HashMap<String,Double> parameters) {
-		// init stores information about the current negotiation session, and stores the parameters for the acceptance strategy.
-		
 		// Store the information about the current negotiation session.
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
@@ -38,15 +39,21 @@ public class Group1_AS extends AcceptanceStrategy {
 			utilityGap = parameters.get("b");
 	}
 	
+	/**
+	 *  Determines whether the last bid from the opponent is acceptable. The bid
+	 * is deemed acceptable if the bid is larger than this agent's next bid, or
+	 * when the deadline has passed and the opponent's last bid is higher than
+	 * expected.
+	 * 
+	 * The opponent's bid is acceptable when either of the following cases is true:
+	 *	- The opponent's last bid is larger than this agent's next bid (see isACnextAcceptable());
+	 *	- The deadline has passed and the opponent's last bid is larger than expected (see isACtimeAcceptable() and getMaxW())
+	 * 
+	 * @return Actions.Accept if the opponent's bid is acceptable, else
+	 *         Actions.Reject.
+	 */
 	@Override
 	public Actions determineAcceptability() {
-		// determineAcceptability returns Actions.Accept if the last bid from the opponent is deemed acceptable. If it is not,
-		// the function returns Actions.Reject.
-		//
-		// The opponent's bid is acceptable when either of the following cases is true:
-		// - The opponent's last bid is larger than this agent's next bid (see isACnextAcceptable());
-		// - The deadline has passed and the opponent's last bid is larger than expected (see isACtimeAcceptable() and getMaxW())
-
 		// Get the current time
 		double time = negotiationSession.getTime();
 		// Get the discounted utility of the opponent's last bid
@@ -62,10 +69,14 @@ public class Group1_AS extends AcceptanceStrategy {
 		}
 	}
 	
-	boolean isACnextAcceptable() {
-		// isACnextAcceptable returns true when a*Uopp+b>=Unext, where Uopp is the utility of the opponent's last bid,
-		// and Unext is the utility of this agent's next bid.
-		
+	/**
+	 * Determine whether the last bid of the opponent is acceptable, compared to the planned next bid.
+	 * The bid is acceptable if a * U_opp + b >= U_next. U_opp is the utility of the
+	 * opponents last bid, U_next is the utility of the agent's next bid.
+	 * 
+	 * @return true if (a * U_opp + b >= U_next)
+	 */
+	boolean isACnextAcceptable() {		
 		// Get the current time
 		double time = negotiationSession.getTime();
 		// Get the utility of the opponent's last bid.
@@ -77,9 +88,12 @@ public class Group1_AS extends AcceptanceStrategy {
 		return utilityFactor*opponentBidUtility+utilityGap >= nextBidUtility;
 	}
 	
+	/**
+	 * Check if the deadline has passed
+	 * 
+	 * @return true if (current time > deadline).
+	 */
 	boolean isACtimeAcceptable() {
-		// isACtimeAcceptable returns true when the current time is larger than the deadline.
-		
 		// Get the current time
 		double time = negotiationSession.getTime();
 		
@@ -87,6 +101,11 @@ public class Group1_AS extends AcceptanceStrategy {
 		return time > deadline;
 	}
 	
+	/**
+	 * Get the discounted utility of the best bid of the opponent in the time window (2*t-1,t] when t>0.5.
+	 * 
+	 * @return discounted utility of the best bid of the opponent if t>0.5, 1 otherwise.
+	 */
 	double getMaxW() {
 		// getMaxW returns the discounted utility of the best bid of the opponent in the time window (2*t-1,t] when t>0.5.
 		// If t<0.5, the function returns 1.
