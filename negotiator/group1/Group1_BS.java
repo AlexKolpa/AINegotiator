@@ -19,7 +19,7 @@ public class Group1_BS extends OfferingStrategy {
 	private OpponentModel opponentModel;
 	private OMStrategy opponentModelStrategy;
 	private SortedOutcomeSpace outcomeSpace;
-	private Double minUtility, maxUtility, concessionRate, reservationValue;
+	private Double concessionRate, reservationValue;
 
 	@Override
 	public void init(NegotiationSession negotiationSession,
@@ -28,9 +28,7 @@ public class Group1_BS extends OfferingStrategy {
 
 		LOG = Logger.getGlobal();
 		// LOG should post every single log message for debugging.
-		LOG.setLevel(Level.SEVERE);
-
-		LOG.info("\n Setting up bidding strategy");
+		LOG.setLevel(Level.ALL);
 
 		this.session = negotiationSession;
 		this.opponentModel = opponentModel;
@@ -50,23 +48,8 @@ public class Group1_BS extends OfferingStrategy {
 			LOG.severe("Opponent Model Strategy unavailable");
 		}
 
-		if (checkParameter(parameters.get("e"))) {
-			this.concessionRate = parameters.get("e");
-		} else {
-			LOG.severe("Concession rate value 'e' not set in paramaters");
-			this.concessionRate = 1.0;
-		}
-		if (checkParameter(parameters.get(""))) {
-			this.reservationValue = parameters.get("k");
-		} else {
-			LOG.severe("Offset value 'k' not set in paramaters");
-			this.reservationValue = 0.0;
-		}
-		if (checkParameter(parameters.get("min"))) {
-			this.minUtility = parameters.get("min");
-		}
-		if (checkParameter(parameters.get("max"))) {
-			this.maxUtility = parameters.get("max");
+		if (checkParameter(parameters.get("concessionRate"))) {
+			this.concessionRate = 0.3;
 		}
 	}
 
@@ -95,8 +78,6 @@ public class Group1_BS extends OfferingStrategy {
 
 		boolean outcomeSpaceAvailable = outcomeSpace != null;
 
-		LOG.info("Determining next bid.");
-
 		/*
 		 * Base bid on: TODO Time - Less time left, more concession steps;
 		 * perhaps nice steps Utility - Maximize! Opponent Model - Hopefully be
@@ -104,10 +85,10 @@ public class Group1_BS extends OfferingStrategy {
 		 */
 
 		// Utility calculation
-		double lastOwnUtility = session.getDiscountedUtility(session
-				.getOwnBidHistory().getLastBid(), session.getTime());
-
-		LOG.info("LastOwnUtility is " + lastOwnUtility);
+		// double lastOwnUtility = session.getDiscountedUtility(session
+		// .getOwnBidHistory().getLastBid(), session.getTime());
+		//
+		// LOG.info("LastOwnUtility is " + lastOwnUtility);
 		/*
 		 * Pick three bids, based on lastOwnUtility: - 1.1 times lastOwnUtility
 		 * if it's not over 1, else pick 1 - lastOwnUtility -
@@ -115,9 +96,13 @@ public class Group1_BS extends OfferingStrategy {
 		 * be the reservation value
 		 */
 
-		misc.Range range = new misc.Range(
-				0.9 * calculateTimeInfluencedUtilityGoal(session.getTime()),
-				1.2 * calculateTimeInfluencedUtilityGoal(session.getTime()));
+		double utilityGoal = calculateTimeInfluencedUtilityGoal(session
+				.getTime());
+		misc.Range range = new misc.Range(0.9 * utilityGoal, 1.1 * utilityGoal);
+		String rangeString = range.getLowerbound() + " to "
+				+ range.getUpperbound();
+		// LOG.severe("Range calculated: " + rangeString + ", for utilGoal: "
+		// + utilityGoal + ", and time: " + session.getTime());
 		List<BidDetails> possibleBids = outcomeSpace.getBidsinRange(range);
 		if (possibleBids == null || possibleBids.isEmpty()) {
 			LOG.severe("Possible bids is emtpy or null: "
@@ -133,47 +118,6 @@ public class Group1_BS extends OfferingStrategy {
 			LOG.severe("BidWithTopOpponentUtility was null");
 		}
 		return bidWithTopOpponentUtility;
-
-		// if (outcomeSpaceAvailable) {
-		// LOG.info("Calculating BidDetails for several utility values");
-		//
-		// Double fortunateFactor = 1.3;
-		// Double concessionFactor = 0.7;
-		// Double fortunateUtility = (fortunateFactor * lastOwnUtility < 1) ?
-		// fortunateFactor
-		// * lastOwnUtility
-		// : 1;
-		// Double concessionUtility = (concessionFactor * lastOwnUtility >
-		// reservationValue) ? concessionFactor
-		// * lastOwnUtility
-		// : reservationValue;
-		// BidDetails fortunate = outcomeSpace
-		// .getBidNearUtility(fortunateUtility);
-		// BidDetails nice = outcomeSpace.getBidNearUtility(lastOwnUtility);
-		// BidDetails concession = outcomeSpace
-		// .getBidNearUtility(concessionUtility);
-		//
-		// if (fortunate.equals(nice) || fortunate.equals(concession)
-		// || nice.equals(concession)) {
-		// LOG.warning("Fortunate bid, nice bid and concession bit not unique");
-		// }
-		//
-		// LOG.info("Calculations done");
-		// try {
-		// LOG.info("Trying to choose Nash best");
-		// BidDetails outcome = pickNashBestBid(fortunate, nice,
-		// concession);
-		// LOG.info("Returning " + outcome.getBid().toString()
-		// + " as next bid.");
-		// return outcome;
-		// } catch (Exception e) {
-		// LOG.severe("Error in picking best bid: " + e.toString());
-		// return null;
-		// }
-		// } else {
-		// LOG.severe("No outcome space available!");
-		// return null;
-		// }
 	}
 
 	/**
@@ -185,8 +129,6 @@ public class Group1_BS extends OfferingStrategy {
 	@Override
 	public BidDetails determineOpeningBid() {
 
-		LOG.info("Determining opening bid.");
-
 		BidDetails bid = null;
 
 		if (outcomeSpace != null) {
@@ -196,48 +138,7 @@ public class Group1_BS extends OfferingStrategy {
 			bid = session.getMaxBidinDomain();
 		}
 
-		LOG.info("Returning " + bid.getBid().toString() + " as opening bid.");
-
 		return bid;
-	}
-
-	/**
-	 * Returns the best bid given in bids, based on the product of the utility
-	 * of the bid for this agent and for the opponent. The latter utility is
-	 * based on the opponentModel. An arbitrary number of BidDetails can be
-	 * given.
-	 * 
-	 * @param bids
-	 *            An arbitrary number of BidDetails.
-	 * @return The BidDetails object with the highest product of the utility for
-	 *         the agent and its opponent
-	 * @throws Exception
-	 *             if the bestBid was not set in the inspection of bids.
-	 *             Indicates further issues.
-	 */
-	private BidDetails pickNashBestBid(BidDetails... bids) throws Exception {
-
-		BidDetails bestBid = null;
-		double bestUtil = -1;
-
-		for (BidDetails bid : bids) {
-			double oppUtil = opponentModel.getBidEvaluation(bid.getBid());
-			double ownUtil = session.getDiscountedUtility(bid.getBid(),
-					session.getTime());
-
-			double nash = oppUtil * ownUtil;
-			if (nash > bestUtil) {
-				bestUtil = nash;
-				bestBid = bid;
-			}
-		}
-
-		if (bestBid == null) {
-			LOG.severe("BestBid was null, using nice bid");
-			return bids[2];
-		}
-
-		return bestBid;
 	}
 
 	/**
@@ -249,6 +150,22 @@ public class Group1_BS extends OfferingStrategy {
 	 * @return a double which is the factor.
 	 */
 	private Double calculateTimeInfluencedUtilityGoal(double time) {
-		return reservationValue + (1 - reservationValue) * (1 - time);
+
+		// This is the moment in time until which we put our foot down
+		double hardheadedUntil = 0.2;
+
+		if (time < hardheadedUntil) {
+			return 1.0;
+		} else {
+			// double result = reservationValue + (1 - reservationValue)
+			// * (1 - Math.pow(time, concessionRate));
+
+			double result = (1 - hardheadedUntil) - time
+					* (1 - hardheadedUntil);
+
+			LOG.info("utilityGoal, time: " + result + ", " + time);
+
+			return result;
+		}
 	}
 }

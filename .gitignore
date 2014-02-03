@@ -7,6 +7,7 @@
 *.ear
 
 previousTournament
+log/*
 
 # IntelliJ Files, sorry this should be in my personal .gitignore_global but lazy #
 
