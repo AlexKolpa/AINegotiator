@@ -1,6 +1,7 @@
 package negotiator.group1;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -114,10 +115,15 @@ public class Group1_BS extends OfferingStrategy {
 		 * be the reservation value
 		 */
 
-		return outcomeSpace
-				.getBidNearUtility(calculateTimeInfluencedUtilityGoal(session
-						.getTime()));
+		misc.Range range = new misc.Range(
+				0.9 * calculateTimeInfluencedUtilityGoal(session.getTime()),
+				1.2 * calculateTimeInfluencedUtilityGoal(session.getTime()));
+		List<BidDetails> possibleBids = outcomeSpace.getBidsinRange(range);
 
+		BidDetails bidWithTopOpponentUtility = opponentModel
+				.getBid(possibleBids);
+
+		return bidWithTopOpponentUtility;
 		// if (outcomeSpaceAvailable) {
 		// LOG.info("Calculating BidDetails for several utility values");
 		//
