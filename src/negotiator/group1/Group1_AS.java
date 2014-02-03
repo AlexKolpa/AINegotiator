@@ -10,11 +10,11 @@ import negotiator.boaframework.NegotiationSession;
 import negotiator.boaframework.OfferingStrategy;
 
 public class Group1_AS extends AcceptanceStrategy {
-	
+
 	// Context in which the negotiation takes place.
 	NegotiationSession negotiationSession;
 	OfferingStrategy offeringStrategy;
-	
+
 	// Parameters for the acceptance strategy.
 	// Deadline is the time after which the agent should accept less favorable bids.
 	double deadline = 0.99;
@@ -30,8 +30,9 @@ public class Group1_AS extends AcceptanceStrategy {
 		// Store the information about the current negotiation session.
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
-		// Check the supplied parameters, and overwrite the default values if the parameter is supplied by the user.
-		if(parameters.get("T") != null)
+		// Check the supplied parameters, and overwrite the default values if
+		// the parameter is supplied by the user.
+		if (parameters.get("T") != null)
 			deadline = parameters.get("T");
 		if(parameters.get("a") != null)
 			utilityFactor = parameters.get("a");
@@ -57,10 +58,11 @@ public class Group1_AS extends AcceptanceStrategy {
 		// Get the current time
 		double time = negotiationSession.getTime();
 		// Get the discounted utility of the opponent's last bid
-		double opponentBidUtility = negotiationSession.getDiscountedUtility(negotiationSession.getOpponentBidHistory().getLastBid(), time);
+		double opponentBidUtility = negotiationSession.getDiscountedUtility(
+				negotiationSession.getOpponentBidHistory().getLastBid(), time);
 		// Get MaxW
 		double maxW = getMaxW();
-		
+
 		// Decide on the action that should be returned
 		if( isACnextAcceptable() || (isACtimeAcceptable() && opponentBidUtility > maxW)) {
 			return Actions.Accept;
@@ -80,7 +82,8 @@ public class Group1_AS extends AcceptanceStrategy {
 		// Get the current time
 		double time = negotiationSession.getTime();
 		// Get the utility of the opponent's last bid.
-		double opponentBidUtility = negotiationSession.getDiscountedUtility(negotiationSession.getOpponentBidHistory().getLastBid(), time);
+		double opponentBidUtility = negotiationSession.getDiscountedUtility(
+				negotiationSession.getOpponentBidHistory().getLastBid(), time);
 		// Get the utility of this agent's next bid.
 		double nextBidUtility = negotiationSession.getDiscountedUtility(offeringStrategy.getNextBid().getBid(),time);
 		
@@ -113,16 +116,18 @@ public class Group1_AS extends AcceptanceStrategy {
 		// Get the current time.
 		double time = negotiationSession.getTime();
 		// Get the opponent's bid history.
-		BidHistory opponentBidHistory = negotiationSession.getOpponentBidHistory();
-		
+		BidHistory opponentBidHistory = negotiationSession
+				.getOpponentBidHistory();
+
 		// Return 1 if t<0.5.
 		if(time<0.5) {
 			return 1;
 		}
 		// Calculate the start of the window.
-		double windowStart = 2*time-1;
+		double windowStart = 2 * time - 1;
 		// Find the bids placed by the opponent during the time window.
-		BidHistory filteredBidHistory = opponentBidHistory.filterBetweenTime(windowStart, time);
+		BidHistory filteredBidHistory = opponentBidHistory.filterBetweenTime(
+				windowStart, time);
 		// Find the best undiscounted bid.
 		BidDetails bestUndiscountedBid = filteredBidHistory.getBestBidDetails();
 		// Check if a bid is found. Otherwise, return 1.
