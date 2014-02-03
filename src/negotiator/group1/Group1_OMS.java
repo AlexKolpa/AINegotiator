@@ -28,8 +28,8 @@ public class Group1_OMS extends OMStrategy {
 	 * OpponentModel can always be updated. 
 	 */
 	@Override
-	public boolean canUpdateOM() {		
-		return negotiationSession.getOpponentBidHistory().size() < 100;
+	public boolean canUpdateOM() {
+		return true;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class Group1_OMS extends OMStrategy {
 			//The bid is better than our previously found bid. Take it!
 			if(bidScore > bestBidScore) {
 				bestBid = bid;
-				bestBidScore = bidScore;
+				bestBidScore = bidScore;				
 			}
 		}		
 		
