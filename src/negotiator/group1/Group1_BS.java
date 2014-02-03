@@ -159,13 +159,9 @@ public class Group1_BS extends OfferingStrategy {
 		if (time < hardheadedUntil) {
 			return 1.0;
 		} else {
-			// double result = reservationValue + (1 - reservationValue)
-			// * (1 - Math.pow(time, concessionRate));
+			double result = 1 - Math.pow(time, 1 / concessionRate);
 
-			double result = (1 - hardheadedUntil) - time
-					* (1 - hardheadedUntil);
-
-			LOG.info("utilityGoal, time: " + result + ", " + time);
+			// LOG.info("utilityGoal, time: " + result + ", " + time);
 
 			return result;
 		}

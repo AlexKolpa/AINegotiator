@@ -2,7 +2,7 @@
 <repository fileName="boarepository.xml">
     <biddingstrategies>
 	    <biddingstrategy description="Group1_BS" classPath="negotiator.group1.Group1_BS">
-	    	<parameter name="concessionRate" default="0.3" description="Concession rate in range [0,1). Smaller means more stubborn bids."/>
+	    	<parameter name="concessionRate" default="0.5" description="Concession rate in range [0,1). Smaller means more stubborn bids."/>
 	    </biddingstrategy>
 		<biddingstrategy description="Other - Offer decreasing utility" classPath="negotiator.boaframework.offeringstrategy.other.ChoosingAllBids"/>
 		<biddingstrategy description="Other - Random walker" classPath="negotiator.boaframework.offeringstrategy.other.Random_Offering"/>
