@@ -43,23 +43,30 @@ public class Group1_OMS extends OMStrategy {
 		
 		//This low of a value is totally not needed, since evaluations shouldn't 
 		//go below 0 anyway, but assuming they can doesn't hurt.
-		double bestBidUtil = Double.MIN_VALUE;
+		double bestBidScore = Double.MIN_VALUE;
 		BidDetails bestBid = null;
 		
 		//We want to make sure the OpponentModel didn't fail completely
 		boolean OMFailed = true;
 		
+		double time = negotiationSession.getTime();
 		for(BidDetails bid : bids) {
 			//use the OM to check the bid evaluation
-			double bidEval = model.getBidEvaluation(bid.getBid());
+			double opponentBidEval = model.getBidEvaluation(bid.getBid());
+			//get our own bid evaluation
+			double agentBidEval = negotiationSession.getDiscountedUtility(bid.getBid(), time);
+						
 			//Apparently OM didn't fail for at least one bid evaluation
-			if(bidEval > Epsilon)
+			if(opponentBidEval > Epsilon)
 				OMFailed = false;
 			
+			//use the multiplication of the scores to find a combined score. This emulates finding the Nash point.
+			double bidScore = agentBidEval * opponentBidEval;
+			
 			//The bid is better than our previously found bid. Take it!
-			if(bidEval > bestBidUtil) {
+			if(bidScore > bestBidScore) {
 				bestBid = bid;
-				bestBidUtil = bidEval;
+				bestBidScore = bidScore;
 			}
 		}		
 		
