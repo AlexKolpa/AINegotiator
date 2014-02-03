@@ -119,11 +119,21 @@ public class Group1_BS extends OfferingStrategy {
 				0.9 * calculateTimeInfluencedUtilityGoal(session.getTime()),
 				1.2 * calculateTimeInfluencedUtilityGoal(session.getTime()));
 		List<BidDetails> possibleBids = outcomeSpace.getBidsinRange(range);
+		if (possibleBids == null || possibleBids.isEmpty()) {
+			LOG.severe("Possible bids is emtpy or null: "
+					+ possibleBids.toString());
+		}
 
-		BidDetails bidWithTopOpponentUtility = opponentModel
+		BidDetails bidWithTopOpponentUtility = opponentModelStrategy
 				.getBid(possibleBids);
 
+		if (bidWithTopOpponentUtility != null) {
+			return bidWithTopOpponentUtility;
+		} else {
+			LOG.severe("BidWithTopOpponentUtility was null");
+		}
 		return bidWithTopOpponentUtility;
+
 		// if (outcomeSpaceAvailable) {
 		// LOG.info("Calculating BidDetails for several utility values");
 		//
