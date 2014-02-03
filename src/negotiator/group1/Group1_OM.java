@@ -30,7 +30,9 @@ public class Group1_OM extends OpponentModel {
 	}
 	
 	/**
-	 * Normalize
+	 * Construct the new utility space.
+	 * Stores the numberOfIssues for ease of access.
+	 * Initializes the counting table with empty values.
 	 */
 	private void setupModel(){
 		issueValueCount = new HashMap<Issue, HashMap<ValueDiscrete, Integer>>();		
@@ -54,7 +56,7 @@ public class Group1_OM extends OpponentModel {
 	}
 	
 	/**
-	 * Only update the counting table
+	 * Updates the model, which in our case, is only the counting table.
 	 */
 	@Override
 	public void updateModel(Bid opponentBid, double time) {
@@ -89,10 +91,7 @@ public class Group1_OM extends OpponentModel {
 	 * 1 - (our own utility) 
 	 */
 	@Override	
-	public double getBidEvaluation(Bid bid) {				
-		if(negotiationSession.getOpponentBidHistory().size() < 3)
-			return 1 -negotiationSession.getDiscountedUtility(bid, negotiationSession.getTime());
-		
+	public double getBidEvaluation(Bid bid) {
 		double result = 0;
 		try {
 			int totalBids = negotiationSession.getOpponentBidHistory().size();
@@ -114,6 +113,15 @@ public class Group1_OM extends OpponentModel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		/* Since we can assume our opponent wont likely make an offer of 0 utility,
+		 * our model possibly made a mistake somewhere, or simply doesn't have enough information.
+		 * We assume the utility to be the opposite of our own in that case. 
+		 */
+		if(result < 0.0001d){			
+			return 1 -negotiationSession.getDiscountedUtility(bid, negotiationSession.getTime());			
+		}
+		
 		return result;
 	}
 
