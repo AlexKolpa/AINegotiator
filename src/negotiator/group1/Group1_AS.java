@@ -40,17 +40,13 @@ public class Group1_AS extends AcceptanceStrategy {
 	
 	@Override
 	public Actions determineAcceptability() {
-		// FIXME Remove debug output
-		
 		// determineAcceptability returns Actions.Accept if the last bid from the opponent is deemed acceptable. If it is not,
 		// the function returns Actions.Reject.
 		//
 		// The opponent's bid is acceptable when either of the following cases is true:
 		// - The opponent's last bid is larger than this agent's next bid (see isACnextAcceptable());
 		// - The deadline has passed and the opponent's last bid is larger than expected (see isACtimeAcceptable() and getMaxW())
-		
-		System.out.println("AS: Determine acceptability");
-		
+
 		// Get the current time
 		double time = negotiationSession.getTime();
 		// Get the discounted utility of the opponent's last bid
@@ -60,17 +56,13 @@ public class Group1_AS extends AcceptanceStrategy {
 		
 		// Decide on the action that should be returned
 		if( isACnextAcceptable() || (isACtimeAcceptable() && opponentBidUtility > maxW)) {
-			System.out.println("AS: Accept");
 			return Actions.Accept;
 		} else {
-			System.out.println("AS: Reject");
 			return Actions.Reject;
 		}
 	}
 	
 	boolean isACnextAcceptable() {
-		// FIXME Remove debug output
-		
 		// isACnextAcceptable returns true when a*Uopp+b>=Unext, where Uopp is the utility of the opponent's last bid,
 		// and Unext is the utility of this agent's next bid.
 		
@@ -81,33 +73,21 @@ public class Group1_AS extends AcceptanceStrategy {
 		// Get the utility of this agent's next bid.
 		double nextBidUtility = negotiationSession.getDiscountedUtility(offeringStrategy.getNextBid().getBid(),time);
 		
-		System.out.println("AS ACnext: time="+time);
-		System.out.println("AS ACnext: Uopp="+opponentBidUtility);
-		System.out.println("AS ACnext: Unext="+nextBidUtility);
-		System.out.println("AS ACnext: "+(utilityFactor*opponentBidUtility+utilityGap >= nextBidUtility));
-		
 		// Return whether the opponent's bid is acceptable.
 		return utilityFactor*opponentBidUtility+utilityGap >= nextBidUtility;
 	}
 	
 	boolean isACtimeAcceptable() {
-		// FIXME Remove debug output
-		
 		// isACtimeAcceptable returns true when the current time is larger than the deadline.
 		
 		// Get the current time
 		double time = negotiationSession.getTime();
-		
-		System.out.println("AS ACtime: time="+time);
-		System.out.println("AS ACtime: "+(time>deadline));
 		
 		// Return true if the current time is larger than the deadline.
 		return time > deadline;
 	}
 	
 	double getMaxW() {
-		// FIXME Remove debug output
-		
 		// getMaxW returns the discounted utility of the best bid of the opponent in the time window (2*t-1,t] when t>0.5.
 		// If t<0.5, the function returns 1.
 		
@@ -118,8 +98,6 @@ public class Group1_AS extends AcceptanceStrategy {
 		
 		// Return 1 if t<0.5.
 		if(time<0.5) {
-			System.out.println("AS maxW: time < 0.5");
-			System.out.println("AS maxW: 1");
 			return 1;
 		}
 		// Calculate the start of the window.
@@ -130,15 +108,10 @@ public class Group1_AS extends AcceptanceStrategy {
 		BidDetails bestUndiscountedBid = filteredBidHistory.getBestBidDetails();
 		// Check if a bid is found. Otherwise, return 1.
 		if(bestUndiscountedBid==null) {
-			System.out.println("AS maxW: No best bid found in window ("+windowStart+","+time+")");
-			System.out.println("AS maxW: 1");
 			return 1;			
 		}
 		// Apply the discount factor to the utility of the best bid
 		double bestDiscountedUtil = negotiationSession.getDiscountedUtility(bestUndiscountedBid.getBid(),time);
-		
-		System.out.println("AS maxW: bestDiscountedUtil="+bestDiscountedUtil+" in window ("+windowStart+","+time+")");
-		System.out.println("AS maxW: "+bestDiscountedUtil);
 		
 		return bestDiscountedUtil;
 	}
