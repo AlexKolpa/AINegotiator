@@ -22,7 +22,7 @@ In order to decide to accept an offer or not, the agent takes into account the o
 The agent starts by comparing the last bid from the opponent to the next bid that this agent might place.
 If, after a linear transformation specified by the user, the utility of the opponent's last bid is larger than the utility of the proposed bid, the agent will accept the opponent's bid.
 $$
-AC_\mathrm{next}(\alpha,\beta) \Leftrightarrow \alpha \cdot U_A(b^t_{B\rightarrow A}) + \beta \geq U_A(x^{t'}_{A\rightarrow B})
+AC_\mathrm{next}(\alpha,\beta) \Leftrightarrow \alpha \cdot U_A(x^t_{B\rightarrow A}) + \beta \geq U_A(x^{t'}_{A\rightarrow B})
 $$
 The disadvantage of this acceptance condition is that the agent will not accept any offer unless it produces a better utility than the next counteroffer.
 This becomes apparent when the agent is put up against a hardheaded opponent, as most negotiations end because the deadline has passed.
