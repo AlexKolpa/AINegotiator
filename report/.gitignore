@@ -1,0 +1,8 @@
+# Ignore everything in this folder, except the report.
+*
+!report.tex
+!tex/
+!tex/*
+!img/
+!img/*
+!.gitignore
