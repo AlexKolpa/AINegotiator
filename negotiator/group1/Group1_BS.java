@@ -18,7 +18,7 @@ public class Group1_BS extends OfferingStrategy {
 	private OpponentModel opponentModel;
 	private OMStrategy opponentModelStrategy;
 	private SortedOutcomeSpace outcomeSpace;
-	private Double minUtility, maxUtility, concessionRate, offset;
+	private Double minUtility, maxUtility, concessionRate, reservationValue;
 
 	@Override
 	public void init(NegotiationSession negotiationSession,
@@ -27,7 +27,7 @@ public class Group1_BS extends OfferingStrategy {
 
 		LOG = Logger.getGlobal();
 		// LOG should post every single log message for debugging.
-		LOG.setLevel(Level.ALL);
+		LOG.setLevel(Level.SEVERE);
 
 		LOG.info("\n Setting up bidding strategy");
 
@@ -56,10 +56,10 @@ public class Group1_BS extends OfferingStrategy {
 			this.concessionRate = 1.0;
 		}
 		if (checkParameter(parameters.get(""))) {
-			this.offset = parameters.get("k");
+			this.reservationValue = parameters.get("k");
 		} else {
 			LOG.severe("Offset value 'k' not set in paramaters");
-			this.offset = 0.0;
+			this.reservationValue = 0.0;
 		}
 		if (checkParameter(parameters.get("min"))) {
 			this.minUtility = parameters.get("min");
@@ -114,35 +114,50 @@ public class Group1_BS extends OfferingStrategy {
 		 * be the reservation value
 		 */
 
-		if (outcomeSpaceAvailable) {
-			LOG.info("Calculating BidDetails for several utility values");
+		return outcomeSpace
+				.getBidNearUtility(calculateTimeInfluencedUtilityGoal(session
+						.getTime()));
 
-			Double fortunateUtility = (1.1 * lastOwnUtility < 1) ? 1.1 * lastOwnUtility
-					: 1;
-			Double concessionUtility = (0.9 * lastOwnUtility > offset) ? 0.9 * lastOwnUtility
-					: offset;
-			BidDetails fortunate = outcomeSpace
-					.getBidNearUtility(fortunateUtility);
-			BidDetails nice = outcomeSpace.getBidNearUtility(lastOwnUtility);
-			BidDetails concession = outcomeSpace
-					.getBidNearUtility(concessionUtility);
-
-			LOG.info("Calculations done");
-			try {
-				LOG.info("Trying to choose Nash best");
-				BidDetails outcome = pickNashBestBid(fortunate, nice,
-						concession);
-				LOG.info("Returning " + outcome.getBid().toString()
-						+ " as next bid.");
-				return outcome;
-			} catch (Exception e) {
-				LOG.severe("Error in picking best bid: " + e.toString());
-				return null;
-			}
-		} else {
-			LOG.severe("No outcome space available!");
-			return null;
-		}
+		// if (outcomeSpaceAvailable) {
+		// LOG.info("Calculating BidDetails for several utility values");
+		//
+		// Double fortunateFactor = 1.3;
+		// Double concessionFactor = 0.7;
+		// Double fortunateUtility = (fortunateFactor * lastOwnUtility < 1) ?
+		// fortunateFactor
+		// * lastOwnUtility
+		// : 1;
+		// Double concessionUtility = (concessionFactor * lastOwnUtility >
+		// reservationValue) ? concessionFactor
+		// * lastOwnUtility
+		// : reservationValue;
+		// BidDetails fortunate = outcomeSpace
+		// .getBidNearUtility(fortunateUtility);
+		// BidDetails nice = outcomeSpace.getBidNearUtility(lastOwnUtility);
+		// BidDetails concession = outcomeSpace
+		// .getBidNearUtility(concessionUtility);
+		//
+		// if (fortunate.equals(nice) || fortunate.equals(concession)
+		// || nice.equals(concession)) {
+		// LOG.warning("Fortunate bid, nice bid and concession bit not unique");
+		// }
+		//
+		// LOG.info("Calculations done");
+		// try {
+		// LOG.info("Trying to choose Nash best");
+		// BidDetails outcome = pickNashBestBid(fortunate, nice,
+		// concession);
+		// LOG.info("Returning " + outcome.getBid().toString()
+		// + " as next bid.");
+		// return outcome;
+		// } catch (Exception e) {
+		// LOG.severe("Error in picking best bid: " + e.toString());
+		// return null;
+		// }
+		// } else {
+		// LOG.severe("No outcome space available!");
+		// return null;
+		// }
 	}
 
 	/**
@@ -207,5 +222,17 @@ public class Group1_BS extends OfferingStrategy {
 		}
 
 		return bestBid;
+	}
+
+	/**
+	 * Returns a factor between the reservation value and 1 that represents the
+	 * time influence. This is a linear function.
+	 * 
+	 * @param time
+	 *            for which to calculate the influence.
+	 * @return a double which is the factor.
+	 */
+	private Double calculateTimeInfluencedUtilityGoal(double time) {
+		return reservationValue + (1 - reservationValue) * (1 - time);
 	}
 }
