@@ -1,8 +1,37 @@
 \section{Acceptance strategy}
 
-The report should include an explanation of the negotiation strategy, decision function for accepting offers, any important preparatory steps, and heuristics that the agent uses to decide what to do next, including the factors that have been selected and their combination into these functions.
+%The report should include an explanation of the negotiation strategy, decision function for accepting offers, any important preparatory steps, and heuristics that the agent uses to decide what to do next, including the factors that have been selected and their combination into these functions.
+%
+%2d) Implement the acceptance strategy (Groupn AS). Describe which factors the agent takes into
+%account for making this decision. Does your agent take time and/or opponent’s actions into
+%account when deciding to accept an offer? In case your agent also uses other considerations to
+%determine whether it will accept particular bids, also explain these considerations.
+%
+%\cite{ASarticle}
+%
+%Acceptance strategy gebaseerd p[ \cite{ASarticle}.
+%Takes into account following factors:
+%Opponent's last bid utility
+%Next own utility
+%Time
 
-2d) Implement the acceptance strategy (Groupn AS). Describe which factors the agent takes into
-account for making this decision. Does your agent take time and/or opponent’s actions into
-account when deciding to accept an offer? In case your agent also uses other considerations to
-determine whether it will accept particular bids, also explain these considerations.
+The acceptance strategy of a BOA agent determines whether the agent should accept the last bid placed by the opponent or if it should place a counteroffer.
+The acceptance strategy used in this agent is based on the results found in \cite{ASarticle}.
+In order to decide to accept an offer or not, the agent takes into account the opponent's bidding history, the utility of the next bid that might be placed by this agent, and the current time in the negotiation session.
+
+The agent starts by comparing the last bid from the opponent to the next bid that this agent might place.
+If, after a linear transformation specified by the user, the utility of the opponent's last bid is larger than the utility of the proposed bid, the agent will accept the opponent's bid.
+$$
+AC_\mathrm{next}(\alpha,\beta) \Leftrightarrow \alpha \cdot U_A(b^t_{B\rightarrow A}) + \beta \geq U_A(x^{t'}_{A\rightarrow B})
+$$
+The disadvantage of this acceptance condition is that the agent will not accept any offer unless it produces a better utility than the next counteroffer.
+This becomes apparent when the agent is put up against a hardheaded opponent, as most negotiations end because the deadline has passed.
+
+In order to reduce the number of failed negotiations, the agent should also take the remaining time into account.
+Once the deadline is sufficiently close, the agent should accept less favorable offers in order to avoid getting no result at all.
+To determine whether a less favorable offer is still acceptable, it is compared with the opponent's bidding history during a time window $W=[t'-r, t']$, where $t'$ is the current time and $r=1-t'$ is the remaining time.
+If the utility of the opponent's last bid is larger than the best bid made during $W$, $\mathrm{MAX}^W$, the last bid is deemed acceptable.
+Together with the previous acceptance condition, this forms the acceptance strategy of the agent:
+$$
+AC_\mathrm{combi}(\alpha,\beta,T) \Leftrightarrow AC_\mathrm{next}(\alpha,\beta) \vee (t' > T) \wedge ( U_A(x^t_{B\rightarrow A}) \geq \mathrm{MAX}^W)
+$$
