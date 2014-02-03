@@ -60,7 +60,7 @@ public class Group1_OMS extends OMStrategy {
 			if(opponentBidEval > Epsilon)
 				OMFailed = false;
 			
-			//use the multiplication of the scores to find a combined score. This emulates finding the Nash point.
+			//use the multiplication of the scores to find a combined score. This emulates finding the Nash product.
 			double bidScore = agentBidEval * opponentBidEval;
 			
 			//The bid is better than our previously found bid. Take it!
