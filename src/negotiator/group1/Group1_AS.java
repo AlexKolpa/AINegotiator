@@ -16,9 +16,11 @@ public class Group1_AS extends AcceptanceStrategy {
 	OfferingStrategy offeringStrategy;
 	
 	// Parameters for the acceptance strategy.
+	// Deadline is the time after which the agent should accept less favorable bids.
 	double deadline = 0.99;
-	double a = 1.0;
-	double b = 0.0;
+	// UtilityFactor and utilityGap are used to determine if this agent's next bid is better than the opponent's last bid, see isACnextAcceptable().
+	double utilityFactor = 1.0;
+	double utilityGap = 0.0;
 	
 	@Override
 	public void init(NegotiationSession negotiationSession,	OfferingStrategy offeringStrategy, HashMap<String,Double> parameters) {
@@ -31,9 +33,9 @@ public class Group1_AS extends AcceptanceStrategy {
 		if(parameters.get("T") != null)
 			deadline = parameters.get("T");
 		if(parameters.get("a") != null)
-			a = parameters.get("a");
+			utilityFactor = parameters.get("a");
 		if(parameters.get("b") != null)
-			b = parameters.get("b");
+			utilityGap = parameters.get("b");
 	}
 	
 	@Override
@@ -45,7 +47,7 @@ public class Group1_AS extends AcceptanceStrategy {
 		//
 		// The opponent's bid is acceptable when either of the following cases is true:
 		// - The opponent's last bid is larger than this agent's next bid (see isACnextAcceptable());
-		// - The deadline has passed and the opponent's last bid is larger than expected (see getMaxW())
+		// - The deadline has passed and the opponent's last bid is larger than expected (see isACtimeAcceptable() and getMaxW())
 		
 		System.out.println("AS: Determine acceptability");
 		
@@ -82,10 +84,10 @@ public class Group1_AS extends AcceptanceStrategy {
 		System.out.println("AS ACnext: time="+time);
 		System.out.println("AS ACnext: Uopp="+opponentBidUtility);
 		System.out.println("AS ACnext: Unext="+nextBidUtility);
-		System.out.println("AS ACnext: "+(a*opponentBidUtility+b >= nextBidUtility));
+		System.out.println("AS ACnext: "+(utilityFactor*opponentBidUtility+utilityGap >= nextBidUtility));
 		
 		// Return whether the opponent's bid is acceptable.
-		return a*opponentBidUtility+b >= nextBidUtility;
+		return utilityFactor*opponentBidUtility+utilityGap >= nextBidUtility;
 	}
 	
 	boolean isACtimeAcceptable() {
