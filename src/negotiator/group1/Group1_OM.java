@@ -2,8 +2,6 @@ package negotiator.group1;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.jfree.util.Log;
-
 import negotiator.Bid;
 import negotiator.boaframework.NegotiationSession;
 import negotiator.boaframework.OpponentModel;
@@ -12,18 +10,26 @@ import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Objective;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.Evaluator;
-import negotiator.utility.EvaluatorDiscrete;
 import negotiator.utility.UtilitySpace;
 
 public class Group1_OM extends OpponentModel {
 
 	//Tracks, for each issues, the amount of times each value has been offered
 	HashMap<Issue, HashMap<ValueDiscrete, Integer>> issueValueCount;
-		
+	
+	//defines the maximum amount of inserts before the model stops updating
+	private int maxInserts;
+	
 	//No parameters necessary. Simply set up the model.	
 	@Override
 	public void init(NegotiationSession negotiationSession, HashMap<String, Double> parameters) throws Exception {
 		this.negotiationSession = negotiationSession;
+		
+		if (parameters != null && parameters.get("i") != null) {
+			maxInserts = parameters.get("i").intValue();
+		} else {
+			maxInserts = 100;
+		}
 		
 		setupModel();
 	}
@@ -31,10 +37,9 @@ public class Group1_OM extends OpponentModel {
 
 	/**
 	 * Construct the new utility space.
-	 * Stores the numberOfIssues for ease of access.
 	 * Initializes the counting table with empty values.
 	 */
-	private void setupModel(){
+	private void setupModel(){		
 		issueValueCount = new HashMap<Issue, HashMap<ValueDiscrete, Integer>>();		
 		opponentUtilitySpace = new UtilitySpace(negotiationSession.getUtilitySpace());
 				
@@ -59,7 +64,9 @@ public class Group1_OM extends OpponentModel {
 	 */
 	@Override
 	public void updateModel(Bid opponentBid, double time) {
-		insertBid(opponentBid);
+		//only insert bid if we have less than 100 bids in our model
+		if(negotiationSession.getOpponentBidHistory().size() < maxInserts)
+			insertBid(opponentBid);		
 	}	
 	
 	
@@ -76,7 +83,9 @@ public class Group1_OM extends OpponentModel {
 				HashMap<ValueDiscrete, Integer> valueMap = issueValueCount.get(i);
 				Integer count = valueMap.get(value);
 				//since Integer is stored by reference, we don't need to replace anything
-				count++;								
+				count++;				
+				
+				valueMap.put(value, count);
 			}
 		} catch (Exception ex){
 			ex.printStackTrace();
@@ -92,37 +101,24 @@ public class Group1_OM extends OpponentModel {
 	@Override	
 	public double getBidEvaluation(Bid bid) {
 		double result = 0;
-		
-		Issue issue = null;
-		ValueDiscrete value = null;
-		HashMap<ValueDiscrete, Integer> valueMap = null;
-		Integer count = null;
-		boolean passedPoint = false;
 		try {
-			int totalBids = negotiationSession.getOpponentBidHistory().size();
+			//total maximum score is the number of bids (with a max of 100) times the number of issues in this
+			int totalMaxScore = Math.min(maxInserts, negotiationSession.getOpponentBidHistory().size());
 			
 			int countScore = 0;
 			
-			for(Issue i : opponentUtilitySpace.getDomain().getIssues()){
-				passedPoint = false;
-				issue = i;
+			for(Issue i : opponentUtilitySpace.getDomain().getIssues()){				
 				//retrieve value from Bid through issueNumber
-				value = (ValueDiscrete)bid.getValue(issue.getNumber());
-				//use issue to get the Value-Integer mapping
-				passedPoint = true;
-				valueMap = issueValueCount.get(issue);
-				count = valueMap.get(value);
+				ValueDiscrete value = (ValueDiscrete)bid.getValue(i.getNumber());
+				//use issue to get the Value-Integer mapping				
+				HashMap<ValueDiscrete, Integer> valueMap = issueValueCount.get(i);
+				Integer count = valueMap.get(value);
 				
-				countScore += count;
+				countScore += count;				
 			}
 			
-			result = countScore / (double) totalBids; 
-		} catch (Exception e) {		
-			System.out.println("past point: " + passedPoint);
-			System.out.println(issue == null? "Issue null" : issue.toString());
-			System.out.println(value == null? "value null" : value.toString());
-			System.out.println(valueMap == null? "valueMap null" : valueMap.toString());
-			System.out.println(count == null? "count null" : count.toString());
+			result = countScore / (double) totalMaxScore; 
+		} catch (Exception e) {				
 			e.printStackTrace();
 		}
 		
@@ -130,8 +126,8 @@ public class Group1_OM extends OpponentModel {
 		 * our model possibly made a mistake somewhere, or simply doesn't have enough information.
 		 * We assume the utility to be the opposite of our own in that case. 
 		 */
-		if(result < 0.0001d){			
-			return 1 -negotiationSession.getDiscountedUtility(bid, negotiationSession.getTime());			
+		if(result < 0.0001d){
+			return 1 - negotiationSession.getDiscountedUtility(bid, negotiationSession.getTime());			
 		}
 		
 		return result;
