@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <repository fileName="boarepository.xml">
-    <biddingstrategies>
-	    <biddingstrategy description="Group1_BS" classPath="negotiator.group1.Group1_BS">
-	    	<parameter name="concessionRate" default="0.5" description="Concession rate in range [0,1). Smaller means more stubborn bids."/>
-	    </biddingstrategy>
+	<biddingstrategies>
 		<biddingstrategy description="2011 - Nice-Tit-For-Tat" classpath="negotiator.boaframework.offeringstrategy.anac2011.NiceTitForTat_Offering"/>
 		<biddingstrategy description="2011 - BRAMAgent" classpath="negotiator.boaframework.offeringstrategy.anac2011.BRAMAgent_Offering"/>
 		<biddingstrategy description="2011 - Agent K2" classpath="negotiator.boaframework.offeringstrategy.anac2011.AgentK2_Offering"/>
 		<biddingstrategy description="Other - Random walker" classpath="negotiator.boaframework.offeringstrategy.other.Random_Offering"/>
+		<biddingstrategy description="Group1_BS" classpath="negotiator.group1.Group1_BS">
+			<parameter name="concessionRate" default="0.5" description="Concession rate in range [0,1). Smaller means more stubborn bids."/>
+		</biddingstrategy>
 		<biddingstrategy description="Other - Offer decreasing utility" classpath="negotiator.boaframework.offeringstrategy.other.ChoosingAllBids"/>
 		<biddingstrategy description="2011 - IAMHaggler2011" classpath="negotiator.boaframework.offeringstrategy.anac2011.IAMhaggler2011_Offering"/>
 		<biddingstrategy description="2011 - The Negotiator" classpath="negotiator.boaframework.offeringstrategy.anac2011.TheNegotiator_Offering"/>
@@ -26,7 +26,11 @@
 		<acceptancecondition description="2011 - Nice-Tit-For-Tat" classpath="negotiator.boaframework.acceptanceconditions.anac2011.AC_NiceTitForTat"/>
 		<acceptancecondition description="2011 - BRAMAgent" classpath="negotiator.boaframework.acceptanceconditions.anac2011.AC_BRAMAgent"/>
 		<acceptancecondition description="2011 - Agent K2" classpath="negotiator.boaframework.acceptanceconditions.anac2011.AC_AgentK2"/>
-		<acceptancecondition description="Group1_AS" classpath="negotiator.group1.Group1_AS"/>
+		<acceptancecondition description="Group1_AS" classpath="negotiator.group1.Group1_AS">
+			<parameter name="a" default="1.0" description="Utility Factor. Accept if a*Uopp+b > Unext"/>
+			<parameter name="b" default="0.0" description="Utility Offset. Accept if a*Uopp+b > Unext"/>
+			<parameter name="T" default="0.99" description="Deadline. Will accept less favorable bids after this time."/>
+		</acceptancecondition>
 		<acceptancecondition description="2011 - IAMHaggler2011" classpath="negotiator.boaframework.acceptanceconditions.anac2011.AC_IAMHaggler2011"/>
 		<acceptancecondition description="Other - False" classpath="negotiator.boaframework.acceptanceconditions.other.AC_False"/>
 		<acceptancecondition description="2011 - The Negotiator" classpath="negotiator.boaframework.acceptanceconditions.anac2011.AC_TheNegotiator"/>
