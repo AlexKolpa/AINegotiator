@@ -20,6 +20,8 @@ public class Group1_OM extends OpponentModel {
 	//defines the maximum amount of inserts before the model stops updating
 	private int maxInserts;
 	
+	private int numberOfIssues;
+	
 	//No parameters necessary. Simply set up the model.	
 	@Override
 	public void init(NegotiationSession negotiationSession, HashMap<String, Double> parameters) throws Exception {
@@ -42,6 +44,7 @@ public class Group1_OM extends OpponentModel {
 	private void setupModel(){		
 		issueValueCount = new HashMap<Issue, HashMap<ValueDiscrete, Integer>>();		
 		opponentUtilitySpace = new UtilitySpace(negotiationSession.getUtilitySpace());
+		numberOfIssues = negotiationSession.getDomain().getIssues().size();		
 				
 		// initialize all the weights
 		for(Entry<Objective, Evaluator> e: opponentUtilitySpace.getEvaluators()){
@@ -103,7 +106,7 @@ public class Group1_OM extends OpponentModel {
 		double result = 0;
 		try {
 			//total maximum score is the number of bids (with a max of 100) times the number of issues in this
-			int totalMaxScore = Math.min(maxInserts, negotiationSession.getOpponentBidHistory().size());
+			int totalMaxScore = Math.min(maxInserts, negotiationSession.getOpponentBidHistory().size()) * numberOfIssues;
 			
 			int countScore = 0;
 			
